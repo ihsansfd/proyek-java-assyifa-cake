@@ -37,7 +37,8 @@ public class LihatProduk extends javax.swing.JFrame {
     Connection conn = null;
     PreparedStatement pS = null;
     ResultSet rS = null;  
-    
+    Runnable threadGambar = null;
+    Thread thread = null;    
     int offSet = 0;
     
     Map<Integer,JLabel> image = new HashMap<Integer,JLabel>();
@@ -73,60 +74,63 @@ public class LihatProduk extends javax.swing.JFrame {
     
     
     public void  tampilGambar(String sql) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {   
+            kosonginGambar();
+            threadGambar = new Runnable() {
+                    @Override
+                    public void run() {
+
+                        try {
+                            conn = getConnection();
+                            pS = getConnection().prepareStatement(sql);
+                            rS = pS.executeQuery();
+                            int i =1;
+                            while(rS.next()) {
+                                byte[] getBytes = rS.getBytes("gambar");
+                                String namaDariDb = rS.getString("nama");
+                                ByteArrayInputStream inputStream = new ByteArrayInputStream(getBytes);
+                                BufferedImage gambar = ImageIO.read(inputStream);
+                                ImageIcon iconBelumResized = new ImageIcon(gambar);
+                                Image resizedImage = iconBelumResized.getImage().getScaledInstance(150, 150, SCALE_SMOOTH);
+                                ImageIcon icon = new ImageIcon(resizedImage);
+
+
+                                image.get(i).setIcon(icon);
+                                namaImage.get(i).setText(namaDariDb);
+                                i++;
+
+                            }
+
+                            if(i<=6) {
+                                nextBT.setEnabled(false);
+                            } else {
+                                nextBT.setEnabled(true);
+                            }
+
+                            if(offSet == 0) {
+                                prevBT.setEnabled(false);
+                            } else{
+                                prevBT.setEnabled(true);
+                            }
+
+
+                        } catch (SQLException | IOException ex) {
+                            Logger.getLogger(LihatProduk.class.getName()).log(Level.SEVERE, null, ex);
+                        } finally {
+                            try {
+                                conn.close();
+                                rS.close();
+                                pS.close();
+                            } catch (SQLException ex) {
+                                Logger.getLogger(LihatProduk.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                };
                 
-                try {
-                    kosonginGambar();
-                    conn = getConnection();
-                    pS = getConnection().prepareStatement(sql);
-                    rS = pS.executeQuery();  
-                    int i =1;
-                    while(rS.next()) {
-                        byte[] getBytes = rS.getBytes("gambar");
-                        String namaDariDb = rS.getString("nama");
-                        ByteArrayInputStream inputStream = new ByteArrayInputStream(getBytes);            
-                        BufferedImage gambar = ImageIO.read(inputStream); 
-                        ImageIcon iconBelumResized = new ImageIcon(gambar);
-                        Image resizedImage = iconBelumResized.getImage().getScaledInstance(150, 150, SCALE_SMOOTH);
-                        ImageIcon icon = new ImageIcon(resizedImage);
 
-
-                        image.get(i).setIcon(icon);
-                        namaImage.get(i).setText(namaDariDb);                
-                        i++;
-
-                    }
-
-                    if(i<=6) {
-                        nextBT.setEnabled(false);
-                    } else {
-                        nextBT.setEnabled(true);
-                    }
-
-                    if(offSet == 0) {
-                        prevBT.setEnabled(false);
-                    } else{
-                        prevBT.setEnabled(true);
-                    }
-
-
-                } catch (SQLException | IOException ex) {
-                    Logger.getLogger(LihatProduk.class.getName()).log(Level.SEVERE, null, ex);
-                } finally {
-                    try {
-                        conn.close();
-                        rS.close();
-                        pS.close();
-                    } catch (SQLException ex) {
-                        Logger.getLogger(LihatProduk.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        };
-        var thread = new Thread(runnable);
-        thread.start();
+            var thread = new Thread(threadGambar);
+            thread.start();
+        
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -290,7 +294,6 @@ public class LihatProduk extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void searchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchKeyTyped
-        
         offSet =0;
                 
         
