@@ -4,6 +4,7 @@
  */
 package com.assyifacake.views.Produk;
 
+import static com.assyifacake.db.KoneksiDatabase.getConnection;
 import com.assyifacake.helpers.validations.exceptions.NonAlphanumericException;
 import com.assyifacake.helpers.validations.AlphanumericValidation;
 import java.awt.Image;
@@ -13,6 +14,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,20 +35,15 @@ public class LihatProduk extends javax.swing.JFrame {
     /**
      * Creates new form LihatProduk
      */
+    Connection conn = null;
+    PreparedStatement pS = null;
+    ResultSet rS = null;  
     
     int offSet = 0;
     
     Map<Integer,JLabel> image = new HashMap<Integer,JLabel>();
     Map<Integer,JLabel> namaImage = new HashMap<Integer, JLabel>();
     
-    public Connection getConnection() throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-
-        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/lab", "root", "");
-
-        return conn;
-        
-    }
     public LihatProduk() {
             
             initComponents();
@@ -67,29 +65,24 @@ public class LihatProduk extends javax.swing.JFrame {
     }
     
     public void kosonginGambar() {
-        image1.setIcon(null);
-        image2.setIcon(null);
-        image3.setIcon(null);
-        image4.setIcon(null);
-        image5.setIcon(null);
-        image6.setIcon(null);
-        namaImage1.setText("");
-        namaImage2.setText("");
-        namaImage3.setText("");
-        namaImage4.setText("");
-        namaImage5.setText("");
-        namaImage6.setText("");
+        
+        for(int i=1; i <= image.size(); i++) {
+        image.get(i).setIcon(null);
+        namaImage.get(i).setText("");
+        }
     }
     
     
     public void  tampilGambar(String sql) {
         Runnable runnable = new Runnable() {
             @Override
-            public void run() {            
+            public void run() {   
+                
                 try {
                     kosonginGambar();
-                    var pS = getConnection().prepareStatement(sql);
-                    var rS = pS.executeQuery();  
+                    conn = getConnection();
+                    pS = getConnection().prepareStatement(sql);
+                    rS = pS.executeQuery();  
                     int i =1;
                     while(rS.next()) {
                         byte[] getBytes = rS.getBytes("gambar");
@@ -120,12 +113,16 @@ public class LihatProduk extends javax.swing.JFrame {
                     }
 
 
-                } catch (SQLException ex) {
+                } catch (SQLException | IOException ex) {
                     Logger.getLogger(LihatProduk.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(LihatProduk.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(LihatProduk.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    try {
+                        conn.close();
+                        rS.close();
+                        pS.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(LihatProduk.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         };
@@ -306,7 +303,7 @@ public class LihatProduk extends javax.swing.JFrame {
             search.setText("");
             return;
         }
-        String sql =  "SELECT * FROM fileUpload Where nama like '%"+ketikan+"%' LIMIT 6";    
+        String sql =  "SELECT * FROM fileUpload WHERE nama like '%"+ketikan+"%' LIMIT 6";    
     
         tampilGambar(sql);
                 
@@ -376,15 +373,11 @@ public class LihatProduk extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LihatProduk.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LihatProduk.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LihatProduk.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(LihatProduk.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        
         //</editor-fold>
 
         /* Create and display the form */

@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  */
 public class OnlyNumbersValidation {
         
-    private static Pattern p = Pattern.compile("^[a-zA-Z0-9]*$");
+    private static Pattern p = Pattern.compile("[0-9]+");
     
     public static void validate(String input) throws NotNumbersException {
         Matcher m = p.matcher(input);

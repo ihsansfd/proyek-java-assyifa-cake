@@ -4,6 +4,7 @@
  */
 package com.assyifacake.views.Produk;
 
+import static com.assyifacake.db.KoneksiDatabase.getConnection;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,15 +26,6 @@ public class AturProduk extends javax.swing.JFrame {
     /**
      * Creates new form AturProduk
      */
-    
-    public Connection getConnection() throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        
-        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/lab", "root", "");
-        
-        return conn;
-        
-    }
     
     
     public AturProduk() {
@@ -110,11 +102,7 @@ public class AturProduk extends javax.swing.JFrame {
 //            myWriter.write(encodedString);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(AturProduk.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(AturProduk.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(AturProduk.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
+        } catch (SQLException | IOException ex) {
             Logger.getLogger(AturProduk.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
