@@ -4,8 +4,8 @@
  */
 package com.assyifacake.views.Produk;
 
-import com.assyifacake.helpers.validation.exception.NonAlphanumericException;
-import com.assyifacake.helpers.validation.AlphanumericValidation;
+import com.assyifacake.helpers.validations.exceptions.NonAlphanumericException;
+import com.assyifacake.helpers.validations.AlphanumericValidation;
 import java.awt.Image;
 import static java.awt.Image.SCALE_SMOOTH;
 import java.awt.image.BufferedImage;
