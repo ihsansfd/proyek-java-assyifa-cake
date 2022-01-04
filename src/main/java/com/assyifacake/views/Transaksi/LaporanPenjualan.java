@@ -5,7 +5,12 @@
 package com.assyifacake.views.Transaksi;
 
 import java.awt.Dimension;
-import javax.swing.JInternalFrame;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -23,31 +28,94 @@ public class LaporanPenjualan extends javax.swing.JFrame {
      */
     public LaporanPenjualan() {
         initComponents();
-        final ChartPanel frame1 = createFrame1();        
-        jPanel1.add(frame1);
-        frame1.setVisible(true);
+        createFrame1();        
     }
     
-    private ChartPanel createFrame1() {
-        final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        dataset.addValue(34.0, "Penjualan/produk", "Kue Enak");
-        dataset.addValue(23.0, "Penjualan/produk", "Kue Enggak Enak");
-        dataset.addValue(54.0, "Penjualan/produk", "Kue Sultan");
-        final JFreeChart chart = ChartFactory.createBarChart(
-            "", 
-            "Produk",
-            "Penjualan",
-            dataset,
-            PlotOrientation.VERTICAL,
-            true,
-            true,
-            false
-        );
-        final ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setSize(500,500);
-        chartPanel.setPreferredSize(new Dimension(300, 300));
+    
+    private void createFrame1() {
+        JLabel loading = new JLabel("Loading, please wait", SwingConstants.CENTER);
+        loading.setSize(500, 500);
+        loading.setAlignmentY(250);
+        jPanel1.add(loading);
+        jPanel1.revalidate();
+        jPanel1.repaint();
 
-        return chartPanel;        
+        SwingWorker<DefaultCategoryDataset, Void> thread;
+        thread = new SwingWorker<>() {
+
+            @Override
+            protected DefaultCategoryDataset doInBackground() throws Exception {
+                final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+                dataset.addValue(34.0, "Penjualan/produk", "Kue Enak");
+                dataset.addValue(23.0, "Penjualan/produk", "Kue Enggak Enak");
+                dataset.addValue(54.0, "Penjualan/produk", "Kue Sultan");
+                return dataset;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    DefaultCategoryDataset dataset = get();
+
+                    final JFreeChart chart = ChartFactory.createBarChart(
+                            "",
+                            "Produk",
+                            "Penjualan",
+                            dataset,
+                            PlotOrientation.VERTICAL,
+                            true,
+                            true,
+                            false
+                    );
+                    final ChartPanel chartPanel = new ChartPanel(chart);
+                    chartPanel.setSize(500,500);
+                    chartPanel.setPreferredSize(new Dimension(300, 300));
+                    jPanel1.removeAll();
+                    jPanel1.add(chartPanel);
+                    chartPanel.setVisible(true);
+                } catch (ExecutionException ex) {
+                    Logger.getLogger(LaporanPenjualan.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(LaporanPenjualan.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+        };
+        thread.execute();
+//                JLabel loading = new JLabel("Loading, please wait",SwingConstants.CENTER);
+//                loading.setSize(500,500);
+//                loading.setAlignmentY(250);
+//                jPanel1.add(loading);
+//                
+//                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+//                        dataset.addValue(34.0, "Penjualan/produk", "Kue Enak");
+//                        dataset.addValue(23.0, "Penjualan/produk", "Kue Enggak Enak");
+//                        dataset.addValue(54.0, "Penjualan/produk", "Kue Sultan");
+//                        final JFreeChart chart = ChartFactory.createBarChart(
+//                            "", 
+//                            "Produk",
+//                            "Penjualan",
+//                            dataset,
+//                            PlotOrientation.VERTICAL,
+//                            true,
+//                            true,
+//                            false
+//                        );
+//                        final ChartPanel chartPanel = new ChartPanel(chart);
+//                        chartPanel.setSize(500,500);
+//                        chartPanel.setPreferredSize(new Dimension(300, 300));
+//                        jPanel1.removeAll();
+//                        jPanel1.add(chartPanel);
+//                        chartPanel.setVisible(true);
+//                    }
+//        
+//    });
+//               
+//                
+//       
     }
 
     /**
@@ -59,7 +127,25 @@ public class LaporanPenjualan extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel5 = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+
+        jPanel5.setBackground(new java.awt.Color(255, 0, 0));
+        jPanel5.setForeground(new java.awt.Color(0, 0, 0));
+        jPanel5.setPreferredSize(new java.awt.Dimension(300, 300));
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -75,25 +161,46 @@ public class LaporanPenjualan extends javax.swing.JFrame {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 497, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Penjualan/Produk", jPanel1);
+
+        jPanel4.setBackground(new java.awt.Color(255, 0, 0));
+        jPanel4.setForeground(new java.awt.Color(0, 0, 0));
+        jPanel4.setPreferredSize(new java.awt.Dimension(300, 300));
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 500, Short.MAX_VALUE)
         );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 497, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Keuntungan/Waktu", jPanel4);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(33, 33, 33)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(261, Short.MAX_VALUE))
+                .addGap(20, 20, 20)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(274, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
                 .addContainerGap())
         );
+
+        jTabbedPane1.getAccessibleContext().setAccessibleName("Penjualan/Produk");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -124,16 +231,22 @@ public class LaporanPenjualan extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(LaporanPenjualan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
+            java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new LaporanPenjualan().setVisible(true);
-            }
-        });
+                
+           }
+                
+           });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration//GEN-END:variables
 }
